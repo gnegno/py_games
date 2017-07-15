@@ -44,7 +44,7 @@ class Boxy(object):
 
     def draw_all_cells(self):
         for i in range(len(self.cells_centers)):
-            pygame.draw.rect(DISPLAY_SURF, BLACK, (self.cells_centers[i][1] - self.cells_size/2,
+            pygame.draw.rect(DISPLAY_SURF, PALETTE_YELLOW, (self.cells_centers[i][1] - self.cells_size/2,
                                                    self.cells_centers[i][0] - self.cells_size/2,
                                                    self.cells_size, self.cells_size))
 
@@ -83,7 +83,7 @@ class Boxy(object):
                 self.move()
 
         # Manage the length of the snake
-        if self.nr_cells > 10:
+        if self.nr_cells > 3:
             self.pop_cell()
 
         # Draw the whole snake
@@ -102,34 +102,43 @@ class Boxy(object):
 
 
 snake = Boxy()
+apples_positions =[[center_x, center_y], [center_x + 2*snake.cells_size, center_y + 2*snake.cells_size]]
 
 while True:  # main game loop
-    DISPLAY_SURF.fill(GRAY)
+    DISPLAY_SURF.fill(PALETTE_BLUE_1)
+
+    for i in range(len(apples_positions)):
+        pygame.draw.rect(DISPLAY_SURF, PALETTE_RED, (apples_positions[i][1] - snake.cells_size / 2,
+                                               apples_positions[i][0] - snake.cells_size / 2,
+                                               snake.cells_size, snake.cells_size))
+
     snake.draw_all_cells()
 
     pygame.display.update()
     FPS_CLOCK.tick(FPS)
 
-    # Changing direction based on the
+    # Changing direction based on buttonpress
     for event in pygame.event.get():
-        if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             pygame.quit()
             sys.exit()
 
-        if event.type == KEYUP and event.key == K_LEFT:
+        if event.type == KEYDOWN and event.key == K_LEFT:
             snake.direction = 'left'
             snake.move()
 
-        if event.type == KEYUP and event.key == K_RIGHT:
+        if event.type == KEYDOWN and event.key == K_RIGHT:
             snake.direction = 'right'
             snake.move()
 
-        if event.type == KEYUP and event.key == K_UP:
+        if event.type == KEYDOWN and event.key == K_UP:
             snake.direction = 'up'
             snake.move()
 
-        if event.type == KEYUP and event.key == K_DOWN:
+        if event.type == KEYDOWN and event.key == K_DOWN:
             snake.direction = 'down'
             snake.move()
 
-    snake.move()  # Always moving
+
+
+    # snake.move()  # Always moving
