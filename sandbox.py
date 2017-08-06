@@ -17,7 +17,7 @@ center_y = display_y / 2
 
 DISPLAY_SURF = pygame.display.set_mode((display_x, display_y), 0, 32)
 
-pygame.display.set_caption('Hello World!')
+pygame.display.set_caption('Snake!')
 
 WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
@@ -56,7 +56,9 @@ class Boxy(object):
         self.nr_cells = self.nr_cells - 1
         self.cells_centers = self.cells_centers[:][1:]
 
-    def move(self):
+    def move(self, apples_positions):
+        cells_to_keep = max(self.nr_cells,3)
+
         if self.direction == 'left':
             # Add new element with the center on the left of the last element
             self.push_cell([self.cells_centers[-1][0],
@@ -77,13 +79,19 @@ class Boxy(object):
             self.push_cell([self.cells_centers[-1][0] + self.cells_size,
                            self.cells_centers[-1][1]])
 
+        # Manage eating apples
+        if self.cells_centers[-1] in apples_positions:
+            cells_to_keep += 1
+            apples_positions.remove(self.cells_centers[-1])
+
+        # Manage direction inversion
         if self.nr_cells > 2:
             if self.cells_centers[-1][:] == self.cells_centers[-3][:]:
                 self.invert_direction()
                 self.move()
 
         # Manage the length of the snake
-        if self.nr_cells > 3:
+        if self.nr_cells > cells_to_keep:
             self.pop_cell()
 
         # Draw the whole snake
@@ -96,7 +104,6 @@ class Boxy(object):
         # - new snake if it touches itself
         # - going to the other side if it touches the border
         # - remove the gap between the snake and the border
-        # - growing when eating an apple
         # - adding the "head" to the snake
         # - using the head definition to define the movement to the opposite direction
 
@@ -125,19 +132,19 @@ while True:  # main game loop
 
         if event.type == KEYDOWN and event.key == K_LEFT:
             snake.direction = 'left'
-            snake.move()
+            snake.move(apples_positions)
 
         if event.type == KEYDOWN and event.key == K_RIGHT:
             snake.direction = 'right'
-            snake.move()
+            snake.move(apples_positions)
 
         if event.type == KEYDOWN and event.key == K_UP:
             snake.direction = 'up'
-            snake.move()
+            snake.move(apples_positions)
 
         if event.type == KEYDOWN and event.key == K_DOWN:
             snake.direction = 'down'
-            snake.move()
+            snake.move(apples_positions)
 
 
 
